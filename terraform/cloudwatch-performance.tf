@@ -25,7 +25,7 @@ resource "aws_cloudwatch_metric_alarm" "high_duration" {
   threshold           = 1000  # 1000ms = 1s
   alarm_description   = "Alarm when Lambda takes more than 1s"
   dimensions = {
-    FunctionName = "MiniProject1Lambda" # <-- Replace with your function name
+    FunctionName = "mini-api" # <-- Replace with your function name
   }
   alarm_actions = [aws_sns_topic.lambda_alerts.arn]
 }
