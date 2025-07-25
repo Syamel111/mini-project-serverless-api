@@ -1,16 +1,14 @@
-import json
 import logging
-
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 def handler(event, context):
-    logger.info(json.dumps({
-        "message": "Lambda triggered",
-        "event": event
-    }))
+    logger.info("Lambda triggered")
     
+    # Simulate an error to trigger CloudWatch Alarm
+    logger.error("Simulated failure for alert test")
+
     return {
         "statusCode": 200,
-        "body": json.dumps({"message": "Hello from Mini Project 1!"})
+        "body": '{"message": "Testing error alert"}'
     }
