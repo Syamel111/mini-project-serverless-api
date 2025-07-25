@@ -1,5 +1,5 @@
 provider "aws" {
-  region = var.aws_region
+  region = "ap-southeast-1"
 }
 
 resource "aws_iam_role" "lambda_exec_role" {
@@ -63,4 +63,14 @@ resource "aws_lambda_permission" "apigw_invoke" {
   function_name = aws_lambda_function.mini_api.function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_apigatewayv2_api.http_api.execution_arn}/*/*"
+}
+
+resource "aws_sns_topic" "lambda_alerts" {
+  name = "lambda-error-alerts"
+}
+
+resource "aws_sns_topic_subscription" "email_alert" {
+  topic_arn = aws_sns_topic.lambda_alerts.arn
+  protocol  = "email"
+  endpoint  = "syamelamri13@gmail.com"  # <-- change this
 }
