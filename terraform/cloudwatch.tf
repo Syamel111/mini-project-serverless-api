@@ -1,6 +1,6 @@
 resource "aws_cloudwatch_log_metric_filter" "lambda_error_filter" {
   name           = "LambdaErrorFilter"
-  log_group_name = "/aws/lambda/${var.lambda_function_name}"
+  log_group_name = "/aws/lambda/mini-api"
 
   pattern = "\"ERROR\""
 
