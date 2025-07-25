@@ -21,13 +21,31 @@ jobs:
           zip lambda.zip app.py
           mv lambda.zip ../
 
+      - name: Debug AWS credentials
+        run: |
+          echo "Debugging AWS credentials..."
+          echo "Access Key ID: ${{ secrets.AWS_ACCESS_KEY_ID }}"
+          aws sts get-caller-identity
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ap-southeast-1
+
       - name: Terraform Init
         working-directory: terraform
         run: terraform init
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ap-southeast-1
 
       - name: Terraform Plan
         working-directory: terraform
         run: terraform plan
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ap-southeast-1
 
       - name: Terraform Apply
         working-directory: terraform
@@ -35,3 +53,4 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ap-southeast-1
