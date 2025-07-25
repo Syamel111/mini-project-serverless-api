@@ -27,8 +27,8 @@ resource "aws_lambda_function" "mini_api" {
   runtime       = "python3.12"
   handler       = "app.handler"
   role          = aws_iam_role.lambda_exec_role.arn
-  filename      = "${path.module}/../lambda/lambda.zip"
-  source_code_hash = filebase64sha256("${path.module}/../lambda/lambda.zip")
+  filename      = "${path.module}/../lambda.zip"
+  source_code_hash = filebase64sha256("${path.module}/../lambda.zip")
 }
 
 resource "aws_apigatewayv2_api" "http_api" {
