@@ -2,6 +2,10 @@ provider "aws" {
   region = "ap-southeast-1"
 }
 
+resource "random_id" "suffix" {
+  byte_length = 4
+}
+
 resource "aws_iam_role" "lambda_exec_role" {
   name = "lambda_exec_role"
 
@@ -22,6 +26,21 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
+resource "aws_dynamodb_table" "resume_table" {
+  name         = "resume-table-${random_id.suffix.hex}"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "id"
+
+  attribute {
+    name = "id"
+    type = "S"
+  }
+
+  tags = {
+    Environment = "dev"
+  }
+}
+
 resource "aws_lambda_function" "mini_api" {
   function_name = "mini-api"
   runtime       = "python3.12"
@@ -29,6 +48,12 @@ resource "aws_lambda_function" "mini_api" {
   role          = aws_iam_role.lambda_exec_role.arn
   filename      = "${path.module}/../lambda.zip"
   source_code_hash = filebase64sha256("${path.module}/../lambda.zip")
+
+  environment {
+    variables = {
+      DYNAMODB_TABLE_NAME = aws_dynamodb_table.resume_table.name
+    }
+  }
 }
 
 resource "aws_apigatewayv2_api" "http_api" {
@@ -37,18 +62,23 @@ resource "aws_apigatewayv2_api" "http_api" {
 }
 
 resource "aws_apigatewayv2_integration" "lambda_integration" {
-  api_id           = aws_apigatewayv2_api.http_api.id
-  integration_type = "AWS_PROXY"
-  integration_uri  = aws_lambda_function.mini_api.invoke_arn
-  integration_method = "POST"
+  api_id                = aws_apigatewayv2_api.http_api.id
+  integration_type      = "AWS_PROXY"
+  integration_uri       = aws_lambda_function.mini_api.invoke_arn
+  integration_method    = "POST"
   payload_format_version = "2.0"
 }
 
 resource "aws_apigatewayv2_route" "default_route" {
   api_id    = aws_apigatewayv2_api.http_api.id
   route_key = "GET /"
+  target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
+}
 
-  target = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
+resource "aws_apigatewayv2_route" "post_resume_route" {
+  api_id    = aws_apigatewayv2_api.http_api.id
+  route_key = "POST /resume"
+  target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
 }
 
 resource "aws_apigatewayv2_stage" "default_stage" {
@@ -72,5 +102,5 @@ resource "aws_sns_topic" "lambda_alerts" {
 resource "aws_sns_topic_subscription" "email_alert" {
   topic_arn = aws_sns_topic.lambda_alerts.arn
   protocol  = "email"
-  endpoint  = "syamelamri13@gmail.com"  # <-- change this
+  endpoint  = "syamelamri13@gmail.com"
 }

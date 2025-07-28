@@ -43,7 +43,7 @@ resource "aws_cloudwatch_dashboard" "lambda_dashboard" {
         height = 6,
         properties = {
           metrics = [
-            [ "AWS/Lambda", "Invocations", "FunctionName", "MiniProject1Lambda" ],
+            [ "AWS/Lambda", "Invocations", "FunctionName", "mini-api" ],
             [ ".", "Errors", ".", "." ],
             [ ".", "Duration", ".", ".", { "stat": "Average" } ]
           ],
