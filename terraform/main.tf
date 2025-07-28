@@ -29,10 +29,10 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
 resource "aws_dynamodb_table" "resume_table" {
   name         = "resume-table-${random_id.suffix.hex}"
   billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "id"
+  hash_key     = "email"
 
   attribute {
-    name = "id"
+    name = "email"
     type = "S"
   }
 
@@ -44,7 +44,7 @@ resource "aws_dynamodb_table" "resume_table" {
 resource "aws_lambda_function" "mini_api" {
   function_name = "mini-api"
   runtime       = "python3.12"
-  handler       = "app.handler"
+  handler       = "app.lambda_handler"
   role          = aws_iam_role.lambda_exec_role.arn
   filename      = "${path.module}/../lambda.zip"
   source_code_hash = filebase64sha256("${path.module}/../lambda.zip")
