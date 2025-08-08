@@ -1,6 +1,3 @@
-# mini-project-serverless-api
-Mini Project 1 (learning)
-# Trigger Actions
 # Mini Project 1: Production-Ready Serverless API with Full Observability
 
 ## ✅ Project Summary
